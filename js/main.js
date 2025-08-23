@@ -53,7 +53,7 @@ class Utils {
      */
     static throttle(func, limit) {
         let inThrottle;
-        return function() {
+        return function () {
             const args = arguments;
             const context = this;
             if (!inThrottle) {
@@ -82,7 +82,7 @@ class Utils {
      */
     static smoothScrollTo(element, offset = 0) {
         const elementPosition = element.getBoundingClientRect().top + window.pageYOffset - offset;
-        
+
         if ('scrollBehavior' in document.documentElement.style) {
             window.scrollTo({
                 top: elementPosition,
@@ -107,17 +107,17 @@ class Utils {
             if (!start) start = timestamp;
             const progress = timestamp - start;
             const progressPercentage = Math.min(progress / duration, 1);
-            
+
             // Easing function (ease-out-cubic)
             const ease = 1 - Math.pow(1 - progressPercentage, 3);
-            
+
             window.scrollTo(0, startPosition + distance * ease);
-            
+
             if (progress < duration) {
                 window.requestAnimationFrame(step);
             }
         }
-        
+
         window.requestAnimationFrame(step);
     }
 
@@ -154,21 +154,21 @@ class DOMCache {
             navToggle: '#nav-toggle',
             navMenu: '#nav-menu',
             navLinks: '.nav-link',
-            
+
             // Theme
             themeToggle: '#theme-toggle',
             themeToggleMobile: '#theme-toggle-mobile',
-            
+
             // Hero
             typingText: '#typing-text',
             heroText: '.hero-text',
             heroImage: '.hero-image',
             heroSocial: '.hero-social',
-            
+
             // Other elements
             backToTop: '#back-to-top',
             contactForm: '#contact-form',
-            
+
             // Animation elements
             animateElements: '.animate-on-scroll',
             statNumbers: '.stat-number',
@@ -225,7 +225,7 @@ class ThemeManager {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('portfolio-theme', theme);
         this.updateIcon();
-        
+
         // Announce theme change to screen readers
         this.announceThemeChange(theme);
     }
@@ -233,7 +233,7 @@ class ThemeManager {
     toggleTheme() {
         const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
         this.setTheme(newTheme);
-        
+
         // Add smooth transition
         document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
         setTimeout(() => {
@@ -243,13 +243,13 @@ class ThemeManager {
 
     updateIcon() {
         const buttons = [this.themeToggle, this.themeToggleMobile].filter(Boolean);
-        
+
         buttons.forEach(button => {
             const icon = button.querySelector('i');
             if (icon) {
                 icon.className = this.currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             }
-            
+
             button.setAttribute('aria-pressed', this.currentTheme === 'dark');
             button.title = `Switch to ${this.currentTheme === 'dark' ? 'light' : 'dark'} theme`;
         });
@@ -261,9 +261,9 @@ class ThemeManager {
         announcement.setAttribute('aria-atomic', 'true');
         announcement.className = 'sr-only';
         announcement.textContent = `Switched to ${theme} theme`;
-        
+
         document.body.appendChild(announcement);
-        
+
         setTimeout(() => {
             document.body.removeChild(announcement);
         }, 1000);
@@ -271,10 +271,10 @@ class ThemeManager {
 
     bindEvents() {
         const buttons = [this.themeToggle, this.themeToggleMobile].filter(Boolean);
-        
+
         buttons.forEach(button => {
             button.addEventListener('click', () => this.toggleTheme());
-            
+
             // Keyboard support
             button.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -302,7 +302,7 @@ class NavigationManager {
         this.navLinks = DOMCache.instance.get('navLinks');
         this.isMenuOpen = false;
         this.activeSection = null;
-        
+
         this.init();
     }
 
@@ -315,7 +315,7 @@ class NavigationManager {
         // Mobile menu toggle
         if (this.navToggle && this.navMenu) {
             this.navToggle.addEventListener('click', () => this.toggleMobileMenu());
-            
+
             // Keyboard support for mobile menu
             this.navToggle.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -353,7 +353,7 @@ class NavigationManager {
         }, CONFIG.TIMING.scrollThrottle);
 
         window.addEventListener('scroll', handleScroll);
-        
+
         // Handle resize events
         const handleResize = Utils.debounce(() => {
             if (Utils.getViewportSize() !== 'mobile' && this.isMenuOpen) {
@@ -366,17 +366,17 @@ class NavigationManager {
 
     toggleMobileMenu() {
         this.isMenuOpen = !this.isMenuOpen;
-        
+
         this.navMenu.classList.toggle('active', this.isMenuOpen);
         this.navToggle.classList.toggle('active', this.isMenuOpen);
-        
+
         // Update ARIA attributes
         this.navToggle.setAttribute('aria-expanded', this.isMenuOpen);
         this.navMenu.setAttribute('aria-hidden', !this.isMenuOpen);
-        
+
         // Prevent body scroll when menu is open
         document.body.style.overflow = this.isMenuOpen ? 'hidden' : '';
-        
+
         // Focus management
         if (this.isMenuOpen) {
             this.navMenu.focus();
@@ -393,15 +393,15 @@ class NavigationManager {
 
     handleNavClick(e, link) {
         const href = link.getAttribute('href');
-        
+
         // Handle hash links
         if (href && href.startsWith('#')) {
             const targetSection = document.querySelector(href);
-            
+
             if (targetSection) {
                 e.preventDefault();
                 this.closeMobileMenu();
-                
+
                 // Small delay to allow menu close animation
                 setTimeout(() => {
                     Utils.smoothScrollTo(targetSection, 70);
@@ -412,14 +412,14 @@ class NavigationManager {
 
     handleNavbarScroll() {
         if (!this.navbar) return;
-        
+
         const scrolled = window.scrollY > CONFIG.SCROLL.navbarOffset;
         this.navbar.classList.toggle('scrolled', scrolled);
     }
 
     updateActiveLink() {
         if (!this.navLinks) return;
-        
+
         const sections = document.querySelectorAll('section[id]');
         const scrollPos = window.scrollY + CONFIG.SCROLL.sectionOffset;
         let currentSection = null;
@@ -428,7 +428,7 @@ class NavigationManager {
         sections.forEach(section => {
             const top = section.getBoundingClientRect().top + window.scrollY;
             const height = section.offsetHeight;
-            
+
             if (scrollPos >= top && scrollPos < top + height) {
                 currentSection = section.getAttribute('id');
             }
@@ -437,7 +437,7 @@ class NavigationManager {
         // Update active link if section changed
         if (currentSection && currentSection !== this.activeSection) {
             this.activeSection = currentSection;
-            
+
             this.navLinks.forEach(link => {
                 const isActive = link.getAttribute('href') === `#${currentSection}`;
                 link.classList.toggle('active', isActive);
@@ -453,7 +453,7 @@ class TypingAnimation {
         this.element = element;
         this.texts = texts || [
             'Java Full Stack Enthusiast',
-            'Aspiring Software Engineer', 
+            'Aspiring Software Engineer',
             'Exploring Web Technologies',
             'Problem Solver',
             'Tech Innovation Lover'
@@ -462,7 +462,7 @@ class TypingAnimation {
         this.currentCharIndex = 0;
         this.isDeleting = false;
         this.isPaused = false;
-        
+
         if (this.element) {
             this.start();
         }
@@ -473,13 +473,13 @@ class TypingAnimation {
             this.element.textContent = this.texts[0];
             return;
         }
-        
+
         this.type();
     }
 
     type() {
         const currentText = this.texts[this.currentTextIndex];
-        
+
         if (this.isDeleting) {
             this.currentCharIndex--;
         } else {
@@ -489,7 +489,7 @@ class TypingAnimation {
         this.element.textContent = currentText.substring(0, this.currentCharIndex);
 
         let typeSpeed = CONFIG.TIMING.typingSpeed;
-        
+
         if (this.isDeleting) {
             typeSpeed = CONFIG.TIMING.typingDeleteSpeed;
         }
@@ -518,7 +518,7 @@ class ScrollAnimations {
 
     init() {
         if (!this.animatedElements || Utils.prefersReducedMotion()) return;
-        
+
         if ('IntersectionObserver' in window) {
             this.setupIntersectionObserver();
         } else {
@@ -551,7 +551,7 @@ class ScrollAnimations {
 
     animateElement(element) {
         element.classList.add('animated');
-        
+
         // Add stagger delays for child elements
         const children = element.querySelectorAll('.stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5');
         children.forEach((child, index) => {
@@ -585,7 +585,7 @@ class StatsCounter {
 
     init() {
         if (!this.statElements || Utils.prefersReducedMotion()) return;
-        
+
         if ('IntersectionObserver' in window) {
             this.setupIntersectionObserver();
         } else {
@@ -614,13 +614,13 @@ class StatsCounter {
 
         const updateCounter = () => {
             current += increment;
-            
+
             if (current >= target) {
                 current = target;
                 element.textContent = current;
                 return;
             }
-            
+
             element.textContent = current;
             requestAnimationFrame(updateCounter);
         };
@@ -652,7 +652,7 @@ class SkillBars {
 
     init() {
         if (!this.skillBars || Utils.prefersReducedMotion()) return;
-        
+
         if ('IntersectionObserver' in window) {
             this.setupIntersectionObserver();
         } else {
@@ -676,7 +676,7 @@ class SkillBars {
 
     animateSkillBar(bar) {
         const width = bar.getAttribute('data-width');
-        
+
         setTimeout(() => {
             bar.style.width = `${width}%`;
         }, CONFIG.TIMING.animationDelay);
@@ -705,14 +705,14 @@ class ContactForm {
 
     init() {
         if (!this.form) return;
-        
+
         this.bindEvents();
         this.setupValidation();
     }
 
     bindEvents() {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-        
+
         // Real-time validation
         const formFields = this.form.querySelectorAll('input, textarea');
         formFields.forEach(field => {
@@ -736,7 +736,7 @@ class ContactForm {
         const isRequired = field.hasAttribute('required');
         const type = field.type || field.tagName.toLowerCase();
         const errorElement = field.parentNode.querySelector('.form-error');
-        
+
         let isValid = true;
         let errorMessage = '';
 
@@ -767,14 +767,14 @@ class ContactForm {
 
     async handleSubmit(e) {
         e.preventDefault();
-        
+
         const submitBtn = this.form.querySelector('button[type="submit"]');
         const formData = new FormData(this.form);
-        
+
         // Validate all fields
         const formFields = this.form.querySelectorAll('input[required], textarea[required]');
         let isFormValid = true;
-        
+
         formFields.forEach(field => {
             if (!this.validateField(field)) {
                 isFormValid = false;
@@ -790,37 +790,32 @@ class ContactForm {
         this.setLoadingState(submitBtn, true);
 
         try {
-            // Simulate API call (replace with actual endpoint)
-            await this.simulateFormSubmission(formData);
-            
-            // Success
-            this.showMessage('Thank you! Your message has been sent successfully. I\'ll get back to you soon.', 'success');
-            this.form.reset();
-            this.clearErrors();
-            
+            // ✅ Real API call to Formspree
+            const response = await fetch(this.form.action, {
+                method: this.form.method,
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+                this.showMessage('Thank you! Your message has been sent successfully. I\'ll get back to you soon.', 'success');
+                this.form.reset();
+                this.clearErrors();
+            } else {
+                this.showMessage('Sorry, there was an error sending your message. Please try again.', 'error');
+            }
         } catch (error) {
             console.error('Form submission error:', error);
-            this.showMessage('Sorry, there was an error sending your message. Please try again.', 'error');
+            this.showMessage('Sorry, there was a network error. Please try again.', 'error');
         } finally {
             this.setLoadingState(submitBtn, false);
         }
     }
 
-    async simulateFormSubmission(formData) {
-        // Simulate API delay
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                // Simulate success (replace with actual API call)
-                const success = Math.random() > 0.1; // 90% success rate for demo
-                success ? resolve() : reject(new Error('Simulated error'));
-            }, 1500);
-        });
-    }
-
     setLoadingState(button, isLoading) {
         button.classList.toggle('loading', isLoading);
         button.disabled = isLoading;
-        
+
         const btnText = button.querySelector('.btn-text');
         if (btnText) {
             btnText.style.opacity = isLoading ? '0' : '1';
@@ -837,7 +832,7 @@ class ContactForm {
                 <span>${message}</span>
             </div>
         `;
-        
+
         // Style the notification
         Object.assign(notification.style, {
             position: 'fixed',
@@ -852,19 +847,19 @@ class ContactForm {
             zIndex: '10000',
             transform: 'translateX(100%)',
             transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            background: type === 'success' 
+            background: type === 'success'
                 ? 'linear-gradient(135deg, #10b981, #059669)'
                 : 'linear-gradient(135deg, #ef4444, #dc2626)',
             boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
         });
 
         document.body.appendChild(notification);
-        
+
         // Animate in
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
         }, 100);
-        
+
         // Auto-remove
         setTimeout(() => {
             notification.style.transform = 'translateX(100%)';
@@ -879,7 +874,7 @@ class ContactForm {
     clearErrors() {
         const errorElements = this.form.querySelectorAll('.form-error');
         errorElements.forEach(error => error.textContent = '');
-        
+
         const errorFields = this.form.querySelectorAll('.error');
         errorFields.forEach(field => field.classList.remove('error'));
     }
@@ -894,7 +889,7 @@ class BackToTop {
 
     init() {
         if (!this.button) return;
-        
+
         this.bindEvents();
         this.handleScroll(); // Initial check
     }
@@ -902,7 +897,7 @@ class BackToTop {
     bindEvents() {
         // Click event
         this.button.addEventListener('click', () => this.scrollToTop());
-        
+
         // Keyboard support
         this.button.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -943,7 +938,7 @@ class LazyLoader {
 
     init() {
         if (!this.images.length) return;
-        
+
         if ('IntersectionObserver' in window) {
             this.setupIntersectionObserver();
         } else {
@@ -1031,7 +1026,7 @@ class ErrorHandler {
             url: window.location.href,
             timestamp: new Date().toISOString()
         };
-        
+
         console.error('Error logged:', errorData);
     }
 }
@@ -1047,7 +1042,7 @@ class PerformanceMonitor {
         if ('PerformanceObserver' in window) {
             this.observePerformance();
         }
-        
+
         this.measurePageLoad();
     }
 
@@ -1086,7 +1081,7 @@ class PerformanceMonitor {
                     this.metrics.domContentLoaded = navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart;
                     this.metrics.loadComplete = navigation.loadEventEnd - navigation.loadEventStart;
                 }
-                
+
                 console.log('Performance metrics:', this.metrics);
             }, 0);
         });
@@ -1126,15 +1121,15 @@ class AccessibilityEnhancer {
                 transform: translateY(-100%);
                 transition: transform 0.3s;
             `;
-            
+
             skipLink.addEventListener('focus', () => {
                 skipLink.style.transform = 'translateY(0)';
             });
-            
+
             skipLink.addEventListener('blur', () => {
                 skipLink.style.transform = 'translateY(-100%)';
             });
-            
+
             document.body.insertBefore(skipLink, document.body.firstChild);
         }
     }
@@ -1142,12 +1137,12 @@ class AccessibilityEnhancer {
     setupFocusManagement() {
         // Enhanced focus indicators
         const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-        
+
         document.querySelectorAll(focusableElements).forEach(element => {
             element.addEventListener('focus', (e) => {
                 e.target.setAttribute('data-focus-visible', 'true');
             });
-            
+
             element.addEventListener('blur', (e) => {
                 e.target.removeAttribute('data-focus-visible');
             });
@@ -1193,10 +1188,10 @@ class AccessibilityEnhancer {
         const focusableElements = document.querySelectorAll(
             'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
-        
+
         const firstFocusable = focusableElements[0];
         const lastFocusable = focusableElements[focusableElements.length - 1];
-        
+
         if (e.shiftKey) {
             if (document.activeElement === firstFocusable) {
                 lastFocusable.focus();
@@ -1216,7 +1211,7 @@ class PortfolioApp {
     constructor() {
         this.isInitialized = false;
         this.components = new Map();
-        
+
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
@@ -1227,20 +1222,20 @@ class PortfolioApp {
 
     init() {
         if (this.isInitialized) return;
-        
+
         try {
             // Initialize DOM cache
             DOMCache.instance = new DOMCache();
-            
+
             // Initialize all components
             this.initializeComponents();
-            
+
             // Setup global event listeners
             this.setupGlobalEvents();
-            
+
             this.isInitialized = true;
             console.log('Portfolio app initialized successfully');
-            
+
         } catch (error) {
             console.error('Failed to initialize portfolio app:', error);
         }
